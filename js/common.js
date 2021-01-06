@@ -1,4 +1,6 @@
 $(document).ready(function() {
+  new WOW().init();
+
   var wHeight = $(window).height(),
       wWidth = $(window).width();
   $(window).on('resize', function() {
@@ -6,7 +8,14 @@ $(document).ready(function() {
         wWidth = $(window).width();
   });
   $(document).on('scroll', function(e) {
-    var scrollTop = $(window).scrollTop();
+    var scrollTop = $(window).scrollTop()
+        wBottom = scrollTop + wHeight,
+        elTop = $('.line-info').offset().top - 100,
+        posEl = elTop - wBottom;
+        pos = (posEl>=0?0:Math.abs(posEl)) * (wWidth / wHeight);
+
+    $('.line-info__text--left').css('left', 'calc(100vw - 80px - ' + pos + 'px)');
+    $('.line-info__text--right').css('right', 'calc(100vw - 80px - ' + pos + 'px)');
 
     if(scrollTop>=300) {
       $('.sidebar__to-top').addClass('sidebar__to-top--visible');
@@ -15,6 +24,19 @@ $(document).ready(function() {
       $('.sidebar__to-top').removeClass('sidebar__to-top--visible');
       $('.sidebar__menu-trigger').removeClass('sidebar__menu-trigger--visible');
     }
+  });
+
+  $('a.scroll-to').on('click', function(e) {
+    e.preventDefault();
+    if($('.navigation--over').length) {
+      $('.sidebar__menu-trigger').trigger('click');
+    }
+    var to = $(this).attr('href'),
+        top = 0;
+    if($(to).length){
+      top = $(to).offset().top - 100;
+    }
+    $("html, body").stop().animate({scrollTop:top}, 800);
   });
 
   var slider = tns({
@@ -32,6 +54,28 @@ $(document).ready(function() {
         items:1
       },
     }
+  });
+
+  $(".btn--point").on("mouseover", function(e){
+      var x = e.clientX,
+          y = e.clientY,
+          wOffset = $(window).scrollTop(),
+          offst = $(this).offset(),
+          point = $(this).find(".btn__point"),
+          fY = y-(offst.top-wOffset);
+      point.css({"left":x-offst.left,"top":y-(offst.top-wOffset)});
+      $(this).find(".btn__point").addClass("btn__point--active");
+  });
+
+  $(".btn--point").on("mouseout", function(e){
+      var x = e.clientX,
+          y = e.clientY,
+          wOffset = $(window).scrollTop(),
+          offst = $(this).offset(),
+          point = $(this).find(".btn__point"),
+          fY = y-(offst.top-wOffset);
+      point.css({"left":x-offst.left,"top":fY});
+      $(this).find(".btn__point").removeClass("btn__point--active");
   });
 
   $('.sidebar__menu-trigger').on('click', function() {
